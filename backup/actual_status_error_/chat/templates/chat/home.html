@@ -1,0 +1,57 @@
+<!-- chat/templates/chat/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Home</title>
+</head>
+<body hx-ext="sse" sse-connect="{% url 'room_chat_sse' 'general' %}">
+    <h1>Chat Options</h1>
+    
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in to chat</a></p>
+    {% endif %}
+
+
+    <h2>Direct Messages</h2>
+    <ul>
+        {% for user_in_list in all_users %}
+            <li><a href="{% url 'dm_chat_page' user_in_list.username %}">{{ user_in_list.username }}</a>
+                <span id="status-{{ user_in_list.username }}"></span>
+            </li>
+        {% empty %}
+            <li>No other users found.</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Chat Rooms</h2>
+    <ul>
+        {% for room in all_rooms %}
+            <li><a href="{% url 'room_chat_page' room.slug %}">{{ room.name }}</a></li>
+        {% empty %}
+            <li>No chat rooms found.</li>
+        {% endfor %}
+    </ul>
+
+
+    <script>
+        htmx.on("sse:status-update", function(evt) {
+            const onlineUsers = JSON.parse(evt.detail);
+            const statusSpans = document.querySelectorAll("[id^='status-']");
+            
+            statusSpans.forEach(span => {
+                const username = span.id.replace('status-', '');
+                if (onlineUsers.includes(username)) {
+                    span.textContent = ' (online)';
+                    span.style.color = 'green';
+                } else {
+                    span.textContent = ' (offline)';
+                    span.style.color = 'gray';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

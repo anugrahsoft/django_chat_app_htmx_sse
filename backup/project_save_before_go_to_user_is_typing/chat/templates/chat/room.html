@@ -1,0 +1,40 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat in {{ room.name }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+</head>
+<body>
+    <h1>Chat in {{ room.name }}</h1>
+    
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in to chat</a></p>
+    {% endif %}
+    
+    <div id="chat-feed" 
+         hx-ext="sse" 
+         sse-connect="{% url 'room_chat_sse' room.slug %}" 
+         sse-swap="new-message" 
+         hx-swap="beforeend">
+        {% for message in messages %}
+            <p><strong>{{ message.user.username }}:</strong> {{ message.content }}</p>
+        {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form hx-post="{% url 'room_post_message' room.slug %}" 
+              hx-target="#chat-feed" 
+              hx-swap="none" 
+              hx-trigger="submit"
+              hx-on::after-request="this.reset()">
+            <input type="text" name="message" placeholder="Type a message..." required>
+            <button type="submit">Send</button>
+        </form>
+    {% endif %}
+</body>
+</html>

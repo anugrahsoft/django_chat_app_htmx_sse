@@ -1,0 +1,8 @@
+gunicorn chat_app.asgi:application   --worker-class uvicorn_worker.UvicornWorker   --workers 4   --bind 0.0.0.0:8000
+
+
+
+gunicorn chat_app.asgi:application \
+  --worker-class uvicorn_worker.UvicornWorker \
+  --workers 4 \
+  --bind 0.0.0.0:8000

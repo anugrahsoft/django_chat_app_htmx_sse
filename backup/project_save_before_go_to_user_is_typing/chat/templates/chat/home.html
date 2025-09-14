@@ -1,0 +1,34 @@
+<!-- chat/templates/chat/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Home</title>
+</head>
+<body>
+    <h1>Chat Options</h1>
+    
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in to chat</a></p>
+    {% endif %}
+
+    <h2>Direct Messages</h2>
+    <ul>
+        {% for user_in_list in all_users %}
+            <li><a href="{% url 'dm_chat_page' user_in_list.username %}">{{ user_in_list.username }}</a></li>
+        {% empty %}
+            <li>No other users found.</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Chat Rooms</h2>
+    <ul>
+        {% for room in all_rooms %}
+            <li><a href="{% url 'room_chat_page' room.slug %}">{{ room.name }}</a></li>
+        {% empty %}
+            <li>No chat rooms found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Django
+uvicorn
+asgiref
+gunicorn
+uvicorn-worker

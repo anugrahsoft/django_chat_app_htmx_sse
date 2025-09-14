@@ -1,0 +1,24 @@
+<!-- chat/templates/chat/home.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Home</title>
+</head>
+<body>
+    <h2>Users</h2>
+    
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in to chat</a></p>
+    {% endif %}
+
+    <ul>
+        {% for user_in_list in all_users %}
+            <li><a href="{% url 'chat_page' user_in_list.username %}">{{ user_in_list.username }}</a></li>
+        {% empty %}
+            <li>No other users found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

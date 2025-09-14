@@ -1,0 +1,36 @@
+<!-- chat/templates/chat/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with {{ recipient.username }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+</head>
+<body>
+    <h1>Chat with {{ recipient.username }}</h1>
+    
+    {% if user.is_authenticated %}
+        <p>Logged in as: {{ user.username }} | <a href="{% url 'logout' %}">Log out</a></p>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in to chat</a></p>
+    {% endif %}
+    
+    <div id="chat-feed" hx-ext="sse" sse-connect="{% url 'dm_chat_sse' recipient.username %}" sse-swap="new-message" hx-swap="beforeend">
+        {% for message in messages %}
+            <p><strong>{{ message.user.username }}:</strong> {{ message.content }}</p>
+        {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form hx-post="{% url 'dm_post_message' recipient.username %}" 
+              hx-target="#chat-feed" 
+              hx-swap="none" 
+              hx-trigger="submit"
+              hx-on::after-request="this.reset()">  <!-- Add this line -->
+            <input type="text" name="message" placeholder="Type a message..." required>
+            <button type="submit">Send</button>
+        </form>
+    {% endif %}
+</body>
+</html>
